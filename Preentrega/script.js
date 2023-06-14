@@ -1,115 +1,129 @@
-const valor_compra_dolar_oficial = 227.97
-const valor_venta_dolar_oficial = 235.89
-const valor_compra_dolar_blue = 466
-const valor_venta_venta_blue = 471
-
-
-const Bienvenida = alert("Bienvenido, vamos a cotizar en dolar su monto.")
-
-
-
-function validar_num(numero, mensaje){
-  while(isNaN(numero)){
-    alert("Por favor ingresar un dato numerico")
-    numero = parseInt(prompt(mensaje))
-  }
-  return numero;
-}
-
-function compra_dolar_blue(monto) {
-  return monto * valor_compra_dolar_blue
-};
-
-function venta_dolar_blue(monto) {
-  return monto * valor_venta_venta_blue
-};
-
-function compra_dolar_oficial(monto) {
-  return monto * valor_compra_dolar_oficial
-};
-
-function venta_dolar_oficial(monto) {
-  return monto * valor_venta_dolar_oficial
-};
-
-
-  class Divisa{
-    constructor(id, moneda){
-      this.id = id,
-      this.moneda = moneda
-    }
-  }
-  
-  const divisa1 = new Divisa(1,"Dolar Oficial")
-  const divisa2 = new Divisa(2,"Dolar Blue")
-  
-  const DIVISAS = [divisa1,divisa2]
-
-function pregunta_1(){
-  let primera_pregunta = "Elija que moneda desea cotizar:  \n";
-
-  DIVISAS.forEach(e => {
-    primera_pregunta += `${e.id} - ${e.moneda} \n`
-  })
-  
-  let respuesta_user = parseInt(prompt(primera_pregunta));
-  respuesta_user = validar_num(respuesta_user, primera_pregunta);
-  return DIVISAS.find(elem => elem.id === respuesta_user );
-  
-}
-
-const divisa_elegida = pregunta_1()
-
-class Operacion{
-  constructor(id, accion){
-    this.id = id,
-    this.accion = accion
-  }
-}
-
-const operacion1 = new Operacion(1,"Compra")
-const operacion2 = new Operacion(2,"Venta")
-
-const OPERACIONES = [operacion1,operacion2]
-
-function pregunta_2(){
-  let segunda_pregunta = "Elija que operacion desea realizar:  \n";
-
-  OPERACIONES.forEach(e => {
-    segunda_pregunta += `${e.id} - ${e.accion} \n`
-  })
-  
-  let respuesta_user2 = parseInt(prompt(segunda_pregunta));
-  respuesta_user2 = validar_num(respuesta_user2, segunda_pregunta)
-  return OPERACIONES.find(elem => elem.id === respuesta_user2 );
-}
-
-const operacion_elegida = pregunta_2()
-  
-function pregunta_3 (){
-  let monto_operacion = parseInt(prompt("¿Cuanto desea cotizar?"))
-  let monto_inicial = monto_operacion
-  if ((divisa_elegida == 1) & (operacion_elegida == 1)){
-    let cotizacion_compra_oficial = compra_dolar_oficial(monto_inicial);
-    alert(`El monto total es ${cotizacion_compra_oficial}`)
-  }
-  if ((divisa_elegida == 1) & (operacion_elegida == 2)) {
-    let cotizacion_venta_oficial = venta_dolar_oficial(monto_inicial);
-    alert(`El monto total es ${cotizacion_venta_oficial}`)
-  }
-  if ((divisa_elegida == 2) & (operacion_elegida == 1)) {
-    let cotizacion_compra_blue = compra_dolar_blue(monto_inicial);
-    alert(`El monto total es ${cotizacion_compra_blue}`)
-  }
-  if ((divisa_elegida == 2) & (operacion_elegida == 2)) {
-    let cotizacion_venta_blue = venta_dolar_blue(monto_inicial);
-    alert(`El monto total es ${cotizacion_venta_blue}`)
-  }
-}
-
+var restante = 0;
+const guardar_presupuesto = () =>{
+    let presupuesto = parseInt(document.querySelector("#presupuesto_inicial").value);
     
-  
 
+    if(presupuesto<1 || isNaN(presupuesto)){
+      mostrar_error("#msj_error_pregunta", "CANTIDAD NO PERMITIDA");
+      return
+    }
+
+    localStorage.setItem("presupuesto",presupuesto);
+    localStorage.setItem("gastos", JSON.stringify([]))
+    actualizar_vista();
+  } 
+  
+const actualizar_vista =() => {
+  let presupuesto = localStorage.getItem("presupuesto");
+  restante = presupuesto;
+
+  let div_pregunta = document.querySelector("#pregunta");
+  let div_gastos = document.querySelector("#div_gastos");
+  let div_control_gastos = document.querySelector("#div_control_gastos");
+  div_pregunta.style.display = "none";
+  div_gastos.style.display = "none";
+
+  let control_gastos = `<div class="gastos_realizados">
+                                 <h2>Lista de Gastos</h2>
+                                 <div class="alert alert_primary"> Presupuesto:$ ${presupuesto} </div>
+                                 <div class="alert alert_succes"> Restante:$ ${presupuesto} </div>
+                        </div>`;  
+
+  if(!presupuesto){
+    div_pregunta.style.display = "block";
+  }else{
+    div_pregunta.style.display = "none";
+    div_gastos.style.display = "block";
+    div_control_gastos.innerHTML = control_gastos;
+    refrescar_listado();
+
+  }
+}
+
+const agregar_gasto = () => {
+  let tipo = document.querySelector("#tipo_gasto").value;
+  let cantidad = parseInt(document.querySelector("#cantidad_gasto").value);
+
+  if(cantidad<1 || isNaN(cantidad) || tipo.trim()===''){
+    mostrar_error("#msj_error_creargasto", "ERROR EN CAMPOS");
+    return;
+  }
+
+  if(cantidad>restante){
+    mostrar_error("#msj_error_creargasto", "CANTIDAD MAYOR A RESTANTE");
+    return;
+  }
+
+  let nuevo_gasto = {
+    tipo,
+    cantidad
+  }
+
+  let gastos = JSON.parse(localStorage.getItem("gastos"));
+  gastos.push(nuevo_gasto);
+  localStorage.setItem("gastos", JSON.stringify(gastos));
+  refrescar_listado();
+
+  document.querySelector("#form_gastos").reset();
+}
+
+const refrescar_listado=()=>{
+   let presupuesto=localStorage.getItem("presupuesto");
+   let gastos=JSON.parse(localStorage.getItem("gastos"));
+
+   let total_gastos = 0
+   let listado_HTML = ``;
+   gastos.map(gasto=>{
+    listado_HTML+=`<li class="gastos">
+                     <p> ${gasto.tipo}
+                     <span class="gasto"> $ ${gasto.cantidad}</span>
+                     </p>
+                    </li>`;
+    total_gastos+=parseInt(gasto.cantidad);                 
+   })
+   console.log("Total de Gastos: "+total_gastos);
+
+   restante = presupuesto-total_gastos;
+
+   let div_control_gastos = document.querySelector("#div_control_gastos");
+
+   div_control_gastos.innerHTML =``;
+
+   if((presupuesto/4)>restante){
+    clase = "alert  alert_danger";
+   }else if((presupuesto/2)>restante){
+    clase = "alert  alert_warning";
+   }else{
+    clase = "alert  alert_succes";
+   }
+
+   div_control_gastos.innerHTML = `<div class="gastos_realizados">
+                                        <h2> Listado de Gastos </h2>
+                                        ${listado_HTML}
+                                        <div class="alert alert_primary"> Presupuesto:$ ${presupuesto} </div>
+                                        <div class="${clase}">
+                                        Restante:$ ${restante} </div>
+
+                                        <button
+                                        onclick="reiniciar_presupuesto()"
+                                        class="button  u-full-width"> Reiniciar Presupuesto </button>
+                                   </div>`;    
+}
+
+const reiniciar_presupuesto = () => {
+  localStorage.clear();
+  location.reload(true);
+}
+
+
+
+
+
+const mostrar_error=(elemento, mensaje)=>{
+  div_error = document.querySelector(elemento);
+  div_error.innerHTML = `<p class="alert  alert_danger   error"> ${mensaje} </p>`;
+  setTimeout(() => { div_error.innerHTML = ``; }, 2000);
+}
 
 
 
