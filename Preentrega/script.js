@@ -1,3 +1,63 @@
+
+const contenido_general = document.getElementById("contenido_general")
+
+contenido_general.innerHTML = `<header>
+<h1>Controlador de Gastos</h1>
+<div class="contenido_principal  contenido">
+    <div class="row">
+        <div id="pregunta">
+            <h2>Presupuesto</h2>
+            <div id="msj_error_pregunta"></div>
+            <form>
+                <input type="number" id="presupuesto_inicial" 
+                 class="u-full-width" 
+                 placeholder="Ingresá tu presupuesto"/>
+                <input type="button" onclick="guardar_presupuesto()" 
+                 class="button-primary  u-full-width"
+                 value="Generar Presupuesto"
+                 />
+            </form>
+        </div>
+        <div id="div_gastos">
+            <div class="one-half  column">
+                <div id="div_crear_gasto">
+                    <form id="form_gastos">
+                        <h2>Gastos</h2>
+                        <div id="msj_error_creargasto"></div>
+                        <div class="campo">
+                            <label>Nombre Gasto</label>
+                            <input type="text" class="u-full-width"
+                             placeholder="Ej. Combustible"
+                             id="tipo_gasto"
+                             />
+                        </div>
+                        <div class="campo">
+                            <label>Valor Gasto</label>
+                            <input type="number" class="u-full-width"
+                             placeholder="Ej. 2000"
+                             id="cantidad_gasto">
+                        </div>
+                        <input type="button" onclick="agregar_gasto()" 
+                         class="button-primary  u-full-width"
+                         value="Agregar Gasto"
+                         />
+                    </form>
+                </div>
+            </div>
+            <div class="one-half  column" id="div_control_gastos">
+
+            </div>
+
+        </div>
+        
+
+    </div>
+</div>
+</header>`
+
+
+
+
 var restante = 0;
 const guardar_presupuesto = () =>{
     let presupuesto = parseInt(document.querySelector("#presupuesto_inicial").value);
@@ -39,6 +99,8 @@ const actualizar_vista =() => {
 
   }
 }
+
+
 
 const agregar_gasto = () => {
   let tipo = document.querySelector("#tipo_gasto").value;
